@@ -2,8 +2,22 @@ import json
 
 # import requests
 
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from mangum import Mangum
 
-def lambda_handler(event, context):
+app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+@app.get("/hello")
+def hello_world():
     """Sample pure Lambda function
 
     Parameters
@@ -35,8 +49,15 @@ def lambda_handler(event, context):
 
     return {
         "statusCode": 200,
-        "body": json.dumps({
-            "message": "hello world",
-            # "location": ip.text.replace("\n", "")
-        }),
+        "body": json.dumps(
+            {
+                "message": "hello world",
+                # "location": ip.text.replace("\n", "")
+            }
+        ),
     }
+
+
+# def lambda_handler(event, context):
+#     return Mangum(app)(event, context)
+lambda_handler = Mangum(app)
